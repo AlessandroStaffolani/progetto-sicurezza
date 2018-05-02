@@ -20,7 +20,7 @@ const styles = theme => ({
         width: '100%',
     },
     card: {
-        margin: theme.spacing.unit * 5
+
     },
     actions: {
         textAlign: 'right'
@@ -64,7 +64,7 @@ class Login extends Component {
                         <Grid item xs={12} sm={8} md={6}>
                             <Card className={classes.card}>
                                 <CardContent >
-                                    <Typography variant={'display1'} gutterBottom>
+                                    <Typography variant={'display2'} gutterBottom>
                                         Login
                                     </Typography>
                                     <div>

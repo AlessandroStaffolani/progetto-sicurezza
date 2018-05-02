@@ -1,41 +1,73 @@
 import React, {Component} from 'react';
 import '../components-styles/App.css';
-import { MuiThemeProvider, createMuiTheme } from 'material-ui/styles';
-import AppBar from './AppBar';
-import Login from './Login';
-import Grid from 'material-ui/Grid';
+import { BrowserRouter as Router, Route, Link, Switch } from "react-router-dom";
+import { withStyles } from 'material-ui/styles';
+import PropTypes from "prop-types";
+import MaterialAppBar from 'material-ui/AppBar';
+import Toolbar from 'material-ui/Toolbar';
+import Typography from 'material-ui/Typography';
+import Button from 'material-ui/Button';
 
+import Home from '../pages/Home';
+import Protected from "../pages/Protected";
+import NotFound from "../pages/NotFound";
 
-const theme = createMuiTheme({
-    palette: {
-        primary: {
-            light: '#90CAF9',
-            main: '#2196F3',
-            dark: '#1565C0',
-            contrastText: '#fff',
-        },
-        secondary: {
-            light: '#FF8A80',
-            main: '#FF1744',
-            dark: '#D50000',
-            contrastText: '#fff',
-        },
+const styles = theme => ({
+    body: {
+        backgroundColor: '#FAFAFA',
+        minHeight: '100vh'
     },
+    root: {
+        flexGrow: 1,
+    },
+    flex: {
+        flex: 1,
+    },
+    menuButton: {
+        marginLeft: -12,
+        marginRight: 20,
+    },
+    link: {
+        textDecoration: 'none',
+        color: 'inherit'
+    }
 });
 
 class App extends Component {
     render() {
+        const { classes } = this.props;
+
         return (
-            <MuiThemeProvider theme={theme}>
-                <AppBar title={'2 Factor Authentication'} them={theme}/>
-                <Grid container justify={'center'} spacing={0}>
-                    <Grid item xs={12} sm={10} md={10}>
-                        <Login theme={theme}/>
-                    </Grid>
-                </Grid>
-            </MuiThemeProvider>
+            <Router>
+                <div className={classes.body}>
+                    <MaterialAppBar position="static" color="primary" className={classes.root}>
+                        <Toolbar>
+                            {/*<IconButton className={classes.menuButton} color="inherit" aria-label="Menu">
+                                <MenuIcon />
+                            </IconButton>*/}
+                            <Typography variant="title" color="inherit" className={classes.flex}>
+                                <Link to='/' className={classes.link}>
+                                    {'Two Factor Authentication'}
+                                </Link>
+                            </Typography>
+                            <Button color="inherit" component={Link} to="/protected">
+                                Protected Area
+                            </Button>
+                        </Toolbar>
+                    </MaterialAppBar>
+                    <Switch>
+                        <Route exact path="/" component={Home} />
+                        <Route path="/protected" component={Protected} />
+                        <Route component={NotFound} />
+                    </Switch>
+                </div>
+            </Router>
         );
     }
 }
 
-export default App;
+App.propTypes = {
+    classes: PropTypes.object.isRequired,
+};
+
+export default withStyles(styles)(App);
