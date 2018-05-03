@@ -21,13 +21,14 @@ class Home extends React.Component {
                         vertical: 'bottom',
                         horizontal: 'center',
                     }}
+                    className={'margin-bottom'}
                     open={showForbidden}
                     autoHideDuration={2000}
                     onClose={handleClose}
                     SnackbarContentProps={{
                         'aria-describedby': 'forbidden-message',
                     }}
-                    message={<span id="forbidden-message">This page <code>{fromPath}</code> is protected, please log in</span>}
+                    message={<span id="forbidden-message">The page <code>{fromPath}</code> is protected, please log in</span>}
                 />
                 <Login/>
             </Container>
