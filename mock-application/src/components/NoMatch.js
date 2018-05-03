@@ -1,8 +1,7 @@
 import React from 'react';
 import Typography from 'material-ui/Typography';
 
-const NoMatch = ({ location }) => {
-
+const NoMatch = ({ props, location }) => {
     return (
         <div>
             <Typography variant={'display2'}>
@@ -12,7 +11,7 @@ const NoMatch = ({ location }) => {
                 Error: 404
             </Typography>
             <Typography variant={'body2'}>
-                No match for
+                No match for <code>{location.pathname}</code>
             </Typography>
         </div>
     )

@@ -2,10 +2,9 @@ import React from 'react';
 import Container from '../components/Container';
 import NoMatch from '../components/NoMatch';
 
-const NotFound = (props) => {
-
+const NotFound = ({ props, location }) => {
     return (
-        <Container {...props}>
+        <Container {...props} location={location}>
             <NoMatch/>
         </Container>
     )

@@ -1,13 +1,9 @@
 import React, {Component} from 'react';
 import '../components-styles/App.css';
-import { BrowserRouter as Router, Route, Link, Switch } from "react-router-dom";
+import { BrowserRouter as Router, Route, Switch, Redirect } from "react-router-dom";
 import { withStyles } from 'material-ui/styles';
 import PropTypes from "prop-types";
 import AppBar from './AppBar';
-import MaterialAppBar from 'material-ui/AppBar';
-import Toolbar from 'material-ui/Toolbar';
-import Typography from 'material-ui/Typography';
-import Button from 'material-ui/Button';
 
 import Home from '../pages/Home';
 import Protected from "../pages/Protected";
@@ -52,7 +48,18 @@ const pages = [
 class App extends Component {
     constructor(props) {
         super(props);
+
+        this.state = {
+            isAuthenticated: false,
+            showForbidden: false
+        };
+
+        this.handleCloseAlert = this.handleCloseAlert.bind(this);
     }
+
+    handleCloseAlert = () => {
+        this.setState({ showForbidden: false });
+    };
 
     render() {
         const { classes } = this.props;
@@ -62,8 +69,14 @@ class App extends Component {
                 <div className={classes.body}>
                     <AppBar pages={pages} title={'Two Factor Authentication'}/>
                     <Switch>
-                        <Route exact path="/" component={Home} />
-                        <Route path="/protected" component={Protected} />
+                        <Route exact path="/" render={
+                            (props) =>
+                                <Home {...props}
+                                      showForbidden={this.state.showForbidden}
+                                      handleClose={this.handleCloseAlert}
+                                />}
+                        />
+                        <PrivateRoute path="/protected" component={Protected} isAuthenticated={this.state.isAuthenticated} />
                         <Route component={NotFound} />
                     </Switch>
                 </div>
@@ -71,6 +84,28 @@ class App extends Component {
         );
     }
 }
+
+const PrivateRoute = ({ component: Component, ...rest }) => {
+    return (
+    <Route
+        {...rest}
+        render={props =>
+            props.isAuthenticated ? (
+                <Component {...props} />
+            ) : (
+                <Redirect
+                    to={{
+                        pathname: "/",
+                        state: {
+                            from: props.location,
+                            forbidden: true,
+                        }
+                    }}
+                />
+            )
+        }
+    />
+)};
 
 App.propTypes = {
     classes: PropTypes.object.isRequired,

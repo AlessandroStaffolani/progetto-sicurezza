@@ -5,18 +5,22 @@ import { withStyles } from 'material-ui/styles';
 
 const styles = theme => ({
     container: {
-        margin: theme.spacing.unit * 5
+        marginTop: theme.spacing.unit * 5
     }
 });
 
 class Container extends React.Component {
 
     render() {
-        const {classes} = this.props;
+        const { classes, children} = this.props;
+
+        const childrenWithProps = React.Children.map(children, child =>
+            React.cloneElement(child, { location: this.props.location }));
+
         return (
             <Grid className={classes.container} container justify={'center'} spacing={0}>
                 <Grid item xs={12} sm={10} md={10}>
-                    {this.props.children}
+                    {childrenWithProps}
                 </Grid>
             </Grid>
         )
