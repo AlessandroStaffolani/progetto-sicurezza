@@ -105,9 +105,11 @@ passport.use(new LocalStrategy(User.authenticate()));*/
  *Routes
  */
 
-const api = require('./api/authentication');
+const authentication = require('./api/authentication');
+const user = require('./api/user');
 
-app.use('/api/v1/', api);
+app.use('/api/v1/auth/', authentication);
+app.use('/api/v1/user/', user);
 
 //==============================================================================
 
