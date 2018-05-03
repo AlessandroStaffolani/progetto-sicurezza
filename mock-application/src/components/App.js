@@ -3,6 +3,7 @@ import '../components-styles/App.css';
 import { BrowserRouter as Router, Route, Link, Switch } from "react-router-dom";
 import { withStyles } from 'material-ui/styles';
 import PropTypes from "prop-types";
+import AppBar from './AppBar';
 import MaterialAppBar from 'material-ui/AppBar';
 import Toolbar from 'material-ui/Toolbar';
 import Typography from 'material-ui/Typography';
@@ -33,28 +34,33 @@ const styles = theme => ({
     }
 });
 
+const pages = [
+    {
+        id: 0,
+        code: 'home',
+        label: 'Home',
+        path: '/'
+    },
+    {
+        id: 1,
+        code: 'protected',
+        label: 'Protected Area',
+        path: '/protected'
+    }
+];
+
 class App extends Component {
+    constructor(props) {
+        super(props);
+    }
+
     render() {
         const { classes } = this.props;
 
         return (
             <Router>
                 <div className={classes.body}>
-                    <MaterialAppBar position="static" color="primary" className={classes.root}>
-                        <Toolbar>
-                            {/*<IconButton className={classes.menuButton} color="inherit" aria-label="Menu">
-                                <MenuIcon />
-                            </IconButton>*/}
-                            <Typography variant="title" color="inherit" className={classes.flex}>
-                                <Link to='/' className={classes.link}>
-                                    {'Two Factor Authentication'}
-                                </Link>
-                            </Typography>
-                            <Button color="inherit" component={Link} to="/protected">
-                                Protected Area
-                            </Button>
-                        </Toolbar>
-                    </MaterialAppBar>
+                    <AppBar pages={pages} title={'Two Factor Authentication'}/>
                     <Switch>
                         <Route exact path="/" component={Home} />
                         <Route path="/protected" component={Protected} />
