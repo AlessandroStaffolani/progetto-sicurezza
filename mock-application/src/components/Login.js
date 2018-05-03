@@ -60,8 +60,8 @@ class Login extends Component {
         return (
             <div>
                 <form method={'POST'} name={'login'}>
-                    <Grid container spacing={24} justify={'center'}>
-                        <Grid item xs={12} sm={8} md={6}>
+                    <Grid container justify={'center'}>
+                        <Grid item xs={12} sm={8} md={6} lg={4}>
                             <Card className={classes.card}>
                                 <CardContent >
                                     <Typography variant={'display2'} gutterBottom>
