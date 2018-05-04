@@ -11,7 +11,7 @@ exports.save = (content, useAppend = true) => {
         flag = 'a';
     }
 
-    let data = JSON.stringify(content)
+    let data = JSON.stringify(content);
 
     return new Promise((resolve, reject) => {
 
