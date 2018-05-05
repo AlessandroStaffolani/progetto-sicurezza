@@ -8,6 +8,7 @@ import AppBar from './AppBar';
 import Home from '../pages/Home';
 import Protected from "../pages/Protected";
 import NotFound from "../pages/NotFound";
+import Register from "../pages/Register";
 
 const styles = theme => ({
     body: {
@@ -76,6 +77,7 @@ class App extends Component {
                                       handleClose={this.handleCloseAlert}
                                 />}
                         />
+                        <Route path="/register" component={Register} />
                         <PrivateRoute path="/protected" component={Protected} isAuthenticated={this.state.isAuthenticated} />
                         <Route component={NotFound} />
                     </Switch>

@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import IconButton from 'material-ui/IconButton';
 import Input, { InputLabel, InputAdornment } from 'material-ui/Input';
 import { FormControl } from 'material-ui/Form';
-import {Link} from "react-router-dom";
 import Visibility from '@material-ui/icons/Visibility';
 import VisibilityOff from '@material-ui/icons/VisibilityOff';
 import {withStyles} from "material-ui/styles/index";
@@ -12,6 +11,7 @@ import Typography from 'material-ui/Typography';
 import Card, { CardActions, CardContent } from 'material-ui/Card';
 import Button from 'material-ui/Button';
 import SendIcon from '@material-ui/icons/Send';
+import {Link} from "react-router-dom";
 
 const styles = theme => ({
     margin: {
@@ -35,12 +35,13 @@ const styles = theme => ({
     }
 });
 
-class Login extends Component {
+class Register extends Component {
     constructor(props) {
         super(props);
         this.state = {
             username: '',
             password: '',
+            confirmPassword: '',
             showPassword: false,
         };
 
@@ -64,13 +65,13 @@ class Login extends Component {
 
         return (
             <div>
-                <form method={'POST'} name={'login'}>
+                <form method={'POST'} name={'register'}>
                     <Grid container justify={'center'}>
                         <Grid item xs={12} sm={8} md={6} lg={4}>
                             <Card className={classes.card}>
                                 <CardContent >
                                     <Typography variant={'display2'} gutterBottom>
-                                        Login
+                                        Register
                                     </Typography>
                                     <div>
                                         <FormControl className={classes.textField}>
@@ -104,14 +105,23 @@ class Login extends Component {
                                                 }
                                             />
                                         </FormControl>
+                                        <FormControl className={classes.textField}>
+                                            <InputLabel htmlFor="confirm-password">Confirm Password</InputLabel>
+                                            <Input
+                                                id="confirm-password"
+                                                type={'password'}
+                                                value={this.state.confirmPassword}
+                                                onChange={this.handleChange('confirmPassword')}
+                                            />
+                                        </FormControl>
                                     </div>
                                 </CardContent>
                                 <CardActions className={classes.actions}>
-                                    <Grid container justify={'flex-end'} alignItems={'center'}>
+                                    <Grid container justify={'flex-end'}>
                                         <Grid item xs={8}>
-                                            <Button component={Link} to='/register'>
+                                            <Button component={Link} to='/'>
                                                 <Typography className={classes.actionLink} variant="caption" gutterBottom>
-                                                    Register
+                                                    Login
                                                 </Typography>
                                             </Button>
                                         </Grid>
@@ -132,10 +142,10 @@ class Login extends Component {
     }
 }
 
-Login.propTypes = {
+Register.propTypes = {
     classes: PropTypes.object.isRequired,
 };
 
 
-export default withStyles(styles)(Login);
+export default withStyles(styles)(Register);
 

@@ -2,9 +2,9 @@ const fs = require('fs');
 const path = require('path');
 const config = require('../config/config');
 
-const STORE_FILE_PATH = path.join(__dirname, '..', '..', 'storage/', config.storageFile);
+const STORE_PATH = path.join(__dirname, '..', '..', 'storage/');
 
-exports.save = (content, useAppend = true) => {
+exports.save = (fileName, content, useAppend = true) => {
 
     let flag = 'w';
     if (useAppend) {
@@ -15,7 +15,7 @@ exports.save = (content, useAppend = true) => {
 
     return new Promise((resolve, reject) => {
 
-        fs.writeFile(STORE_FILE_PATH, data, {flag: flag}, (err) => {
+        fs.writeFile(path.join(STORE_PATH, fileName), data, {flag: flag}, (err) => {
             if (err) {
                 reject(err);
             }
@@ -26,11 +26,11 @@ exports.save = (content, useAppend = true) => {
     })
 };
 
-exports.read = () => {
+exports.read = (fileName) => {
 
     return new Promise((resolve, reject) => {
 
-        fs.readFile(STORE_FILE_PATH, (err, data) => {
+        fs.readFile(path.join(STORE_PATH, fileName), (err, data) => {
             if (err) {
                 reject(err);
             }

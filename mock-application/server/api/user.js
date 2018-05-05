@@ -21,7 +21,7 @@ const router = express.Router();
 
 router.get('/', userController.index);
 
-router.get('/get/all', userController.get_all);
+router.get('/get/:username', userController.get_user);
 
 router.post('/create', userController.create);
 

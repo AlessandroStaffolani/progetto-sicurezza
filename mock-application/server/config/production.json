@@ -4,6 +4,5 @@
   "env": "development",
   "dbURL": "mongodb://alessandro:Ale8193@ds111420.mlab.com:11420/le_corone_bis",
   "sessionSecret": "qwertyuiop123456789",
-  "sessionName": "clientManager.sess",
-  "storageFile": "db_storage"
+  "sessionName": "clientManager.sess"
 }
