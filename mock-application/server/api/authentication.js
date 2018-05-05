@@ -21,4 +21,6 @@ const router = express.Router();
 
 router.get('/', authenticationController.index);
 
+router.post('/authenticate', authenticationController.authenticate);
+
 module.exports = router;

@@ -7,12 +7,18 @@ class Home extends React.Component {
 
     render(){
         const { handleClose } = this.props;
+        const { state } = this.props.location;
         let showForbidden = this.props.showForbidden;
         let fromPath = '';
-        const { state } = this.props.location;
+        let isRegistered = false;
         if (state !== undefined) {
             showForbidden = state.forbidden;
-            fromPath = state.from.pathname;
+            if (state.from !== undefined) {
+                fromPath = state.from.pathname;
+            }
+            if (state.username !== undefined) {
+                isRegistered = true;
+            }
         }
         return (
             <Container {...this.props}>
@@ -30,7 +36,7 @@ class Home extends React.Component {
                     }}
                     message={<span id="forbidden-message">The page <code>{fromPath}</code> is protected, please log in</span>}
                 />
-                <Login/>
+                <Login isRegistered={isRegistered} username={isRegistered ? state.username : ''}/>
             </Container>
         )
     };

@@ -2,10 +2,11 @@
 const fileUtility = require('../utils/fileUtils');
 const { body,validationResult } = require('express-validator/check');
 const { sanitizeBody } = require('express-validator/filter');
-const securityUtils = require('../crypto/password');
+const cryptoPassword = require('../crypto/password');
 
 exports.index = (req, res, next) => {
     res.header('Content-Type', 'application/json');
+    res.status(200);
     res.json({title: 'User API'});
 };
 
@@ -13,8 +14,8 @@ exports.get_user = (req, res, next) => {
     fileUtility.read(req.params.username)
         .then(data => {
             res.header('Content-Type', 'application/json');
+            res.status(200);
             res.json({
-                code: 200,
                 user: data
             });
         })
@@ -38,9 +39,9 @@ exports.create = [
         if (!errors.isEmpty()) {
 
             res.header('Content-Type', 'application/json');
+            res.status(500);
             res.json({
-                code: 500,
-                user: errors.mapped()
+                errors: errors.mapped()
             });
 
         } else {
@@ -49,7 +50,7 @@ exports.create = [
                 password: req.body.password
             };
 
-            securityUtils.hash_password(userData.password)
+            cryptoPassword.hash_password(userData.password)
                 .then(result => {
                     userData.password = result.digest;
                     userData.salt = result.salt;
@@ -57,9 +58,11 @@ exports.create = [
                     fileUtility.save(userData.username, userData, false)
                         .then(data => {
                             res.header('Content-Type', 'application/json');
+                            res.status(200);
                             res.json({
-                                code: 200,
-                                user: data
+                                user: {
+                                    username: userData.username
+                                }
                             });
                         })
                         .catch(err => next(err));

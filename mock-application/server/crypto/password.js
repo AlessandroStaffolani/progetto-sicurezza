@@ -18,7 +18,7 @@ exports.generate_salt = () => {
                 reject(err);
             }
 
-            resolve(salt);
+            resolve(salt.toString('hex'));
         })
     })
 
@@ -39,13 +39,34 @@ exports.hash_password = (password) => {
                     }
 
                     resolve({
-                        salt: salt.toString('hex'),
+                        salt: salt,
                         digest: derivedKey.toString('hex')
                     })
                 })
 
             })
             .catch(err => reject(err));
+
+    })
+
+};
+
+exports.verify_password = (checkPassword, salt, password) => {
+
+    return new Promise((resolve, reject) => {
+
+        crypto.pbkdf2(checkPassword, salt, config.iterations, config.hashBytes, 'sha512', (err, verify) => {
+            if (err) {
+                reject(err);
+            }
+            
+            if (verify.toString('hex') === password) {
+                resolve(true);
+            } else {
+                resolve(false);
+            }
+
+        })
 
     })
 
