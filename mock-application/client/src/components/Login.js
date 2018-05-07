@@ -111,7 +111,7 @@ class Login extends Component {
             });
         } else {
 
-            const requestPath = config.host + config.apiName + 'auth/authenticate/';
+            const requestPath = config.host + config.apiName + 'auth/authenticate/first';
 
             let userData = {
                 username: username.value,

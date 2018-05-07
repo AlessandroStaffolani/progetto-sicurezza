@@ -21,6 +21,8 @@ const router = express.Router();
 
 router.get('/', authenticationController.index);
 
-router.post('/authenticate', authenticationController.authenticate);
+router.post('/authenticate/first', authenticationController.authenticate);
+
+router.get('/add/second/:username', authenticationController.add_second);
 
 module.exports = router;

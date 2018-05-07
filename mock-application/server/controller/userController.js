@@ -55,6 +55,7 @@ exports.create = [
                 .then(result => {
                     userData.password = result.digest;
                     userData.salt = result.salt;
+                    userData.two_factor_secret = '';
 
                     User.save(userData)
                         .then(username => {

@@ -3,10 +3,55 @@ const User = require('../model/User');
 const { body,validationResult } = require('express-validator/check');
 const { sanitizeBody } = require('express-validator/filter');
 const cryptoPassword = require('../crypto/password');
+const speakeasy = require('speakeasy');
 
 exports.index = (req, res, next) => {
     res.header('Content-Type', 'application/json');
     res.json({title: 'Authentication API'});
+};
+
+exports.add_second = (req, res, next) => {
+
+    const username = req.params.username;
+    let responseObj = {
+        data: {},
+        errors: []
+    };
+
+    User.find({username: username})
+        .then(user => {
+
+            // genero il segreto temporaneo per l'utente
+            const twoFactorSecret = speakeasy.generateSecret(64);
+            user.two_factor_temp_secret = twoFactorSecret.hex;
+
+            // salvo il segreto
+            User.save(user)
+                .then(response => {
+                    responseObj.data = {
+                        username: response,
+                        twoFactorSecret: twoFactorSecret
+                    };
+                    res.header('Content-Type', 'application/json');
+                    res.status(200);
+                    res.json(responseObj);
+                })
+                .catch(err => next(err));
+
+
+        })
+        .catch(err => {
+            res.header('Content-Type', 'application/json');
+            res.status(200);
+            responseObj.errors = [
+                {
+                    field: 'username',
+                    message: 'This user doesn\'t exist'
+                }
+            ];
+            res.json(responseObj);
+        });
+
 };
 
 exports.authenticate = [
@@ -81,7 +126,6 @@ exports.authenticate = [
                         }
                     ];
                     res.json(responseObj);
-                    console.log(res);
                 });
         }
 
