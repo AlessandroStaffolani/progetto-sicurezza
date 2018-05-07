@@ -1,5 +1,5 @@
 
-const fileUtility = require('../utils/fileUtils');
+const User = require('../model/User');
 const { body,validationResult } = require('express-validator/check');
 const { sanitizeBody } = require('express-validator/filter');
 const cryptoPassword = require('../crypto/password');
@@ -42,7 +42,7 @@ exports.authenticate = [
                 password: req.body.password
             };
 
-            fileUtility.read(requestedUser.username)
+            User.find({username: requestedUser.username})
                 .then(user => {
                     // verifico se la password immessa corrisponde con quella salvata
 

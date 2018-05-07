@@ -1,5 +1,5 @@
 
-const fileUtility = require('../utils/fileUtils');
+const User = require('../model/User');
 const { body,validationResult } = require('express-validator/check');
 const { sanitizeBody } = require('express-validator/filter');
 const cryptoPassword = require('../crypto/password');
@@ -11,7 +11,8 @@ exports.index = (req, res, next) => {
 };
 
 exports.get_user = (req, res, next) => {
-    fileUtility.read(req.params.username)
+
+    User.find({username: req.params.username})
         .then(data => {
             res.header('Content-Type', 'application/json');
             res.status(200);
@@ -55,13 +56,13 @@ exports.create = [
                     userData.password = result.digest;
                     userData.salt = result.salt;
 
-                    fileUtility.save(userData.username, userData, false)
-                        .then(data => {
+                    User.save(userData)
+                        .then(username => {
                             res.header('Content-Type', 'application/json');
                             res.status(200);
                             res.json({
                                 user: {
-                                    username: userData.username
+                                    username: username
                                 }
                             });
                         })
