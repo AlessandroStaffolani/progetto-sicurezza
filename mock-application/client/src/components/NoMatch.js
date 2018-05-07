@@ -4,7 +4,7 @@ import Typography from 'material-ui/Typography';
 const NoMatch = ({ props, location }) => {
     return (
         <div>
-            <Typography variant={'display2'}>
+            <Typography variant={'display1'}>
                 Page not found
             </Typography>
             <Typography variant={'headline'}>
