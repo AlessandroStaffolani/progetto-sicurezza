@@ -20,6 +20,11 @@ exports.authenticate = [
 
     (req, res, next) => {
 
+        let responseObj = {
+            data: {},
+            errors: []
+        };
+
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
 
@@ -45,19 +50,38 @@ exports.authenticate = [
                         .then(response => {
                             res.header('Content-Type', 'application/json');
                             res.status(200);
-                            res.json({
-                                authenticated: response
-                            });
+
+                            if (response) {
+                                responseObj.data = {
+                                    authenticated: response
+                                };
+                            } else {
+                                responseObj.errors = [
+                                    {
+                                        field: 'password',
+                                        message: 'The password provided doesn\'t match'
+                                    }
+                                ];
+                            }
+
+
+
+                            res.json(responseObj);
                         })
                         .catch(err => next(err));
 
                 })
                 .catch(err => {
                     res.header('Content-Type', 'application/json');
-                    res.status(500);
-                    res.json({
-                        errors: 'This user doesn\'t exist'
-                    });
+                    res.status(200);
+                    responseObj.errors = [
+                        {
+                            field: 'username',
+                            message: 'This user doesn\'t exist'
+                        }
+                    ];
+                    res.json(responseObj);
+                    console.log(res);
                 });
         }
 

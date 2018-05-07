@@ -125,7 +125,29 @@ class Login extends Component {
             })
                 .then(result => result.json())
                 .then(response => {
-                    console.log(response);
+                    if (response.errors.length > 0) {
+                        // error
+                        const errors = response.errors;
+                        errors.map(err => {
+                            if (err.field === 'username') {
+                                username.error = true;
+                                username.errorMsg = err.message;
+                            }
+                            if (err.field === 'password') {
+                                password.error = true;
+                                password.errorMsg = err.message;
+                            }
+                        });
+                        password.value = '';
+                        this.setState({
+                            username: username,
+                            password: password
+                        });
+                    } else {
+                        // success
+                        const authenticationData = response.data;
+                        console.log(authenticationData);
+                    }
                 })
                 .catch(errors => console.log(errors));
         }
