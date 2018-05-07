@@ -1,10 +1,5 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import IconButton from 'material-ui/IconButton';
-import Input, { InputLabel, InputAdornment } from 'material-ui/Input';
-import { FormControl, FormHelperText } from 'material-ui/Form';
-import Visibility from '@material-ui/icons/Visibility';
-import VisibilityOff from '@material-ui/icons/VisibilityOff';
 import {withStyles} from "material-ui/styles/index";
 import Grid from 'material-ui/Grid';
 import Typography from 'material-ui/Typography';
@@ -13,6 +8,9 @@ import Button from 'material-ui/Button';
 import SendIcon from '@material-ui/icons/Send';
 import {Link} from "react-router-dom";
 import config from '../config';
+import QRCode from 'qrcode';
+import FormRegister from './FormRegister';
+import FormSecondFactor from './FormSecondFactor';
 
 const styles = theme => ({
     margin: {
@@ -20,6 +18,7 @@ const styles = theme => ({
     },
     textField: {
         width: '100%',
+        marginTop: theme.spacing.unit
     },
     card: {
 
@@ -33,6 +32,10 @@ const styles = theme => ({
     actionLink: {
         textTransform: 'capitalize',
         margin: 0
+    },
+    verticalMargin: {
+        marginTop: theme.spacing.unit * 2,
+        marginBottom: theme.spacing.unit * 2
     }
 });
 
@@ -60,7 +63,15 @@ class Register extends Component {
                 error: false,
                 errorMsg: ''
             },
+            token: {
+                value: '',
+                error: false,
+                errorMsg: ''
+            },
             showPassword: false,
+            firstFactor: true,
+            secretQRcodePath: '',
+            title: 'Register'
         };
 
         this.handleChange = this.handleChange.bind(this);
@@ -88,6 +99,16 @@ class Register extends Component {
     handleSubmit = (event) => {
         event.preventDefault();
 
+        const { firstFactor } = this.state;
+        if (firstFactor) {
+            this.handleFirstFactor()
+        } else {
+            this.handleSecondFactor()
+        }
+
+    };
+
+    handleFirstFactor = () => {
         let { username, password, confirmPassword } = this.state;
         let errors = false;
         if (username.value === '') {
@@ -137,11 +158,80 @@ class Register extends Component {
             })
                 .then(result => result.json())
                 .then(response => {
-                    this.props.history.push('/', {username: response.user.username});
+                    this.loadSecondFactor(response.user.username);
+                    //this.props.history.push('/', {username: response.user.username});
+                })
+                .catch(errors => console.log(errors))
+        }
+    };
+
+    handleSecondFactor = () => {
+
+        let { username, token } = this.state;
+        let errors = false;
+
+        if (token.value === '') {
+            errors = true;
+            token.error = true;
+            token.errorMsg = 'This field is required';
+        }
+
+        if (errors) {
+            this.setState({
+                token: token
+            });
+        } else {
+            // register
+            const requestPath = config.host + config.apiName + 'auth/verify/second';
+
+            let userData = {
+                username: username.value,
+                token: token.value,
+                isConfig: true
+            };
+
+            fetch(requestPath, {
+                method: 'POST',
+                headers: API_HEADERS,
+                body: JSON.stringify(userData)
+            })
+                .then(result => result.json())
+                .then(response => {
+                    this.props.history.push('/', {username: userData.username});
                 })
                 .catch(errors => console.log(errors))
         }
 
+    };
+
+    loadSecondFactor = (username) => {
+        const requestPath = config.host + config.apiName + 'auth/get/config/second/' + username;
+
+        fetch(requestPath, {
+            method: 'GET',
+            headers: API_HEADERS
+        })
+            .then(response => response.json())
+            .then(response => {
+                const secret = response.data.twoFactorSecret;
+
+                QRCode.toDataURL(secret.otpauth_url, (err, dataUrl) => {
+
+                    this.setState({
+                        username: {
+                            value: response.data.username,
+                            error: false,
+                            errorMsg: ''
+                        },
+                        title: 'Config Second Factor',
+                        secretQRcodePath: dataUrl,
+                        firstFactor: false
+                    })
+
+                });
+
+            })
+            .catch(errors => console.log(errors));
     };
 
     render() {
@@ -154,71 +244,79 @@ class Register extends Component {
                         <Grid item xs={12} sm={8} md={6} lg={4}>
                             <Card className={classes.card}>
                                 <CardContent >
-                                    <Typography variant={'display2'} gutterBottom>
-                                        Register
+                                    <Typography variant={'display1'} gutterBottom>
+                                        {this.state.title}
                                     </Typography>
-                                    <div>
-                                        <FormControl className={classes.textField} error={this.state.username.error}>
-                                            <InputLabel htmlFor="username">Usename</InputLabel>
-                                            <Input
-                                                id={'username'}
-                                                type={'text'}
-                                                value={this.state.username.value}
-                                                onChange={this.handleChange('username')}
+                                    {this.state.firstFactor ? (
+                                        <FormRegister
+                                            username={this.state.username}
+                                            password={this.state.password}
+                                            showPassword={this.state.showPassword}
+                                            confirmPassword={this.state.confirmPassword}
+                                            handleChange={this.handleChange}
+                                            handleMouseDownPassword={this.handleMouseDownPassword}
+                                            handleClickShowPassword={this.handleClickShowPassword}
+                                        />
+                                    ) : (
+                                        <div>
+                                            <Typography className={classes.verticalMargin} variant='body2' gutterBottom>
+                                                To complete your registration you need to:
+                                            </Typography>
+                                            <ol>
+                                                <li>
+                                                    <Typography className={classes.verticalMargin} variant='body2' gutterBottom>
+                                                        Open Google Authenticator application on your phone and scan this QRCode
+                                                    </Typography>
+                                                </li>
+                                                <li>
+                                                    <Typography className={classes.verticalMargin} variant='body2' gutterBottom>
+                                                        Then generate and type a pin on the below field
+                                                    </Typography>
+                                                </li>
+                                            </ol>
+                                            <hr/>
+                                            <FormSecondFactor
+                                                username={this.state.username}
+                                                secretQRcodePath={this.state.secretQRcodePath}
+                                                token={this.state.token}
+                                                handleChange={this.handleChange}
                                             />
-                                            <FormHelperText>{this.state.username.errorMsg}</FormHelperText>
-                                        </FormControl>
-                                    </div>
-                                    <div>
-                                        <FormControl className={classes.textField} error={this.state.password.error}>
-                                            <InputLabel htmlFor="adornment-password">Password</InputLabel>
-                                            <Input
-                                                id="adornment-password"
-                                                type={this.state.showPassword ? 'text' : 'password'}
-                                                value={this.state.password.value}
-                                                onChange={this.handleChange('password')}
-                                                endAdornment={
-                                                    <InputAdornment position="end">
-                                                        <IconButton
-                                                            aria-label="Toggle password visibility"
-                                                            onClick={this.handleClickShowPassword}
-                                                            onMouseDown={this.handleMouseDownPassword}
-                                                        >
-                                                            {this.state.showPassword ? <VisibilityOff /> : <Visibility />}
-                                                        </IconButton>
-                                                    </InputAdornment>
-                                                }
-                                            />
-                                            <FormHelperText>{this.state.password.errorMsg}</FormHelperText>
-                                        </FormControl>
-                                        <FormControl className={classes.textField} error={this.state.confirmPassword.error}>
-                                            <InputLabel htmlFor="confirm-password">Confirm Password</InputLabel>
-                                            <Input
-                                                id="confirm-password"
-                                                type={'password'}
-                                                value={this.state.confirmPassword.value}
-                                                onChange={this.handleChange('confirmPassword')}
-                                            />
-                                            <FormHelperText>{this.state.confirmPassword.errorMsg}</FormHelperText>
-                                        </FormControl>
-                                    </div>
+                                        </div>
+                                    )}
                                 </CardContent>
                                 <CardActions className={classes.actions}>
-                                    <Grid container justify={'flex-end'}>
-                                        <Grid item xs={8}>
-                                            <Button component={Link} to='/'>
-                                                <Typography className={classes.actionLink} variant="caption" gutterBottom>
-                                                    Login
+
+                                    {this.state.firstFactor ? (
+                                        <Grid container justify={'flex-end'} alignItems={'center'}>
+                                            <Grid item xs={8}>
+                                                <Button component={Link} to='/'>
+                                                    <Typography className={classes.actionLink} variant="caption" gutterBottom>
+                                                        Login
+                                                    </Typography>
+                                                </Button>
+                                            </Grid>
+                                            <Grid item xs={4}>
+                                                <Button type={'submit'} color={'primary'} variant={'raised'}>
+                                                    Send
+                                                    <SendIcon className={classes.rightIcon}>send</SendIcon>
+                                                </Button>
+                                            </Grid>
+                                        </Grid>
+                                    ) : (
+                                        <Grid container justify={'flex-end'} alignItems={'center'}>
+                                            <Grid item xs={8}>
+                                                <Typography variant={'caption'} gutterBottom>
+                                                    Scan this QRCode
                                                 </Typography>
-                                            </Button>
+                                            </Grid>
+                                            <Grid item xs={4}>
+                                                <Button type={'submit'} color={'primary'} variant={'raised'}>
+                                                    Send
+                                                    <SendIcon className={classes.rightIcon}>send</SendIcon>
+                                                </Button>
+                                            </Grid>
                                         </Grid>
-                                        <Grid item xs={4}>
-                                            <Button type={'submit'} color={'primary'} variant={'raised'}>
-                                                Send
-                                                <SendIcon className={classes.rightIcon}>send</SendIcon>
-                                            </Button>
-                                        </Grid>
-                                    </Grid>
+                                    ) }
                                 </CardActions>
                             </Card>
                         </Grid>

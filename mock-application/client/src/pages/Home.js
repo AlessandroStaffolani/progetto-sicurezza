@@ -20,6 +20,9 @@ class Home extends React.Component {
                 isRegistered = true;
             }
         }
+        if (this.props.redirectToProtected) {
+            this.props.handleRedirectToProtected(this.props.history)
+        }
         return (
             <Container {...this.props}>
                 <Snackbar
@@ -36,7 +39,7 @@ class Home extends React.Component {
                     }}
                     message={<span id="forbidden-message">The page <code>{fromPath}</code> is protected, please log in</span>}
                 />
-                <Login isRegistered={isRegistered} username={isRegistered ? state.username : ''}/>
+                <Login {...this.props} isRegistered={isRegistered}/>
             </Container>
         )
     };

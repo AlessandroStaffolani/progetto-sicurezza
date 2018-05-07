@@ -23,6 +23,8 @@ router.get('/', authenticationController.index);
 
 router.post('/authenticate/first', authenticationController.authenticate);
 
-router.get('/add/second/:username', authenticationController.add_second);
+router.get('/get/config/second/:username', authenticationController.get_config_second);
+
+router.post('/verify/second', authenticationController.verify_second);
 
 module.exports = router;

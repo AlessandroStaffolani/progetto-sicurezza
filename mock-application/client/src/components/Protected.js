@@ -6,7 +6,7 @@ class Protected extends React.Component {
     render() {
         return (
             <div>
-                <Typography variant="display2" gutterBottom>
+                <Typography variant="display1" gutterBottom>
                     Protected area
                 </Typography>
             </div>
