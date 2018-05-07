@@ -1,13 +1,13 @@
 import React from 'react';
 import Container from '../components/Container';
-import NoMatch from '../components/NoMatch';
+import RegisterForm from '../components/Register';
 
-const NotFound = ({ props, location, history }) => {
+const Register = ({ props, location, history }) => {
     return (
         <Container {...props} location={location} history={history}>
-            <NoMatch/>
+            <RegisterForm/>
         </Container>
     )
 };
 
-export default NotFound;
+export default Register;

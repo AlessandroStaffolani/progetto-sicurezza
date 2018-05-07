@@ -15,7 +15,7 @@ class Container extends React.Component {
         const { classes, children} = this.props;
 
         const childrenWithProps = React.Children.map(children, child =>
-            React.cloneElement(child, { location: this.props.location }));
+            React.cloneElement(child, { location: this.props.location, history: this.props.history }));
 
         return (
             <Grid className={classes.container} container justify={'center'} spacing={0}>

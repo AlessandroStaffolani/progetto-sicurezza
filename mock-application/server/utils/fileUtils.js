@@ -1,21 +1,23 @@
 const fs = require('fs');
 const path = require('path');
-const config = require('../config/config');
 
-const STORE_FILE_PATH = path.join(__dirname, '..', '..', 'storage/', config.storageFile);
+const STORE_PATH = path.join(__dirname, '..', '..', 'storage/');
 
-exports.save = (content, useAppend = true) => {
+exports.save = (fileName, content, useAppend = true) => {
+
+    const filePath = path.join(STORE_PATH, (fileName + '.json'));
 
     let flag = 'w';
     if (useAppend) {
         flag = 'a';
     }
 
-    let data = JSON.stringify(content)
+    let data = JSON.stringify(content);
+
 
     return new Promise((resolve, reject) => {
 
-        fs.writeFile(STORE_FILE_PATH, data, {flag: flag}, (err) => {
+        fs.writeFile(filePath, data, {flag: flag}, (err) => {
             if (err) {
                 reject(err);
             }
@@ -26,13 +28,16 @@ exports.save = (content, useAppend = true) => {
     })
 };
 
-exports.read = () => {
+exports.read = (fileName) => {
+
+    const filePath = path.join(STORE_PATH, (fileName + '.json'));
 
     return new Promise((resolve, reject) => {
 
-        fs.readFile(STORE_FILE_PATH, (err, data) => {
+        fs.readFile(filePath, (err, data) => {
             if (err) {
                 reject(err);
+                return;
             }
             resolve(JSON.parse(data));
         })

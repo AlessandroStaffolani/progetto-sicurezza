@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import IconButton from 'material-ui/IconButton';
 import Input, { InputLabel, InputAdornment } from 'material-ui/Input';
 import { FormControl, FormHelperText } from 'material-ui/Form';
-import {Link} from "react-router-dom";
 import Visibility from '@material-ui/icons/Visibility';
 import VisibilityOff from '@material-ui/icons/VisibilityOff';
 import {withStyles} from "material-ui/styles/index";
@@ -12,6 +11,7 @@ import Typography from 'material-ui/Typography';
 import Card, { CardActions, CardContent } from 'material-ui/Card';
 import Button from 'material-ui/Button';
 import SendIcon from '@material-ui/icons/Send';
+import {Link} from "react-router-dom";
 import config from '../config';
 
 const styles = theme => ({
@@ -33,13 +33,6 @@ const styles = theme => ({
     actionLink: {
         textTransform: 'capitalize',
         margin: 0
-    },
-    successMessage: {
-        color: '#388E3C',
-        backgroundColor: '#C8E6C9',
-        border: '1px solid #388E3C',
-        padding: '12px 20px',
-        borderRadius: '2px'
     }
 });
 
@@ -48,16 +41,21 @@ const API_HEADERS = {
     'Content-Type': 'application/json',
 };
 
-class Login extends Component {
+class Register extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            username: {
-                value: props.username,
+            username:  {
+                value: '',
                 error: false,
                 errorMsg: ''
             },
-            password:  {
+            password: {
+                value: '',
+                error: false,
+                errorMsg: ''
+            },
+            confirmPassword: {
                 value: '',
                 error: false,
                 errorMsg: ''
@@ -90,7 +88,7 @@ class Login extends Component {
     handleSubmit = (event) => {
         event.preventDefault();
 
-        let { username, password } = this.state;
+        let { username, password, confirmPassword } = this.state;
         let errors = false;
         if (username.value === '') {
             errors = true;
@@ -104,19 +102,33 @@ class Login extends Component {
             password.errorMsg = 'This field is required';
         }
 
+        if (confirmPassword.value === '') {
+            errors = true;
+            confirmPassword.error = true;
+            confirmPassword.errorMsg = 'This field is required';
+        }
+
+        if (password.value !== confirmPassword.value) {
+            errors = true;
+            password.error = true;
+            confirmPassword.error = true;
+            confirmPassword.errorMsg = 'The two password aren\'t the same'
+        }
+
         if (errors) {
             this.setState({
                 username: username,
-                password: password
+                password: password,
+                confirmPassword: confirmPassword
             });
         } else {
-
-            const requestPath = config.host + config.apiName + 'auth/authenticate/';
-
+            // register
             let userData = {
                 username: username.value,
                 password: password.value
             };
+
+            const requestPath = config.host + config.apiName + 'user/create';
 
             fetch(requestPath, {
                 method: 'POST',
@@ -125,52 +137,26 @@ class Login extends Component {
             })
                 .then(result => result.json())
                 .then(response => {
-                    if (response.errors.length > 0) {
-                        // error
-                        const errors = response.errors;
-                        errors.map(err => {
-                            if (err.field === 'username') {
-                                username.error = true;
-                                username.errorMsg = err.message;
-                            }
-                            if (err.field === 'password') {
-                                password.error = true;
-                                password.errorMsg = err.message;
-                            }
-                        });
-                        password.value = '';
-                        this.setState({
-                            username: username,
-                            password: password
-                        });
-                    } else {
-                        // success
-                        const authenticationData = response.data;
-                        console.log(authenticationData);
-                    }
+                    this.props.history.push('/', {username: response.user.username});
                 })
-                .catch(errors => console.log(errors));
+                .catch(errors => console.log(errors))
         }
+
     };
 
     render() {
-        const { classes, isRegistered } = this.props;
+        const { classes } = this.props;
 
         return (
             <div>
-                <form method={'POST'} name={'login'} onSubmit={this.handleSubmit}>
+                <form method={'POST'} name={'register'} onSubmit={this.handleSubmit}>
                     <Grid container justify={'center'}>
                         <Grid item xs={12} sm={8} md={6} lg={4}>
                             <Card className={classes.card}>
                                 <CardContent >
                                     <Typography variant={'display2'} gutterBottom>
-                                        Login
+                                        Register
                                     </Typography>
-                                    {isRegistered ? (
-                                        <Typography className={classes.successMessage} variant={'subheading'} gutterBottom>
-                                            New user succefully created! Please log in
-                                        </Typography>
-                                    ) : ''}
                                     <div>
                                         <FormControl className={classes.textField} error={this.state.username.error}>
                                             <InputLabel htmlFor="username">Usename</InputLabel>
@@ -205,14 +191,24 @@ class Login extends Component {
                                             />
                                             <FormHelperText>{this.state.password.errorMsg}</FormHelperText>
                                         </FormControl>
+                                        <FormControl className={classes.textField} error={this.state.confirmPassword.error}>
+                                            <InputLabel htmlFor="confirm-password">Confirm Password</InputLabel>
+                                            <Input
+                                                id="confirm-password"
+                                                type={'password'}
+                                                value={this.state.confirmPassword.value}
+                                                onChange={this.handleChange('confirmPassword')}
+                                            />
+                                            <FormHelperText>{this.state.confirmPassword.errorMsg}</FormHelperText>
+                                        </FormControl>
                                     </div>
                                 </CardContent>
                                 <CardActions className={classes.actions}>
-                                    <Grid container justify={'flex-end'} alignItems={'center'}>
+                                    <Grid container justify={'flex-end'}>
                                         <Grid item xs={8}>
-                                            <Button component={Link} to='/register'>
+                                            <Button component={Link} to='/'>
                                                 <Typography className={classes.actionLink} variant="caption" gutterBottom>
-                                                    Register
+                                                    Login
                                                 </Typography>
                                             </Button>
                                         </Grid>
@@ -233,10 +229,10 @@ class Login extends Component {
     }
 }
 
-Login.propTypes = {
+Register.propTypes = {
     classes: PropTypes.object.isRequired,
 };
 
 
-export default withStyles(styles)(Login);
+export default withStyles(styles)(Register);
 
