@@ -3,6 +3,8 @@ const User = require('../model/User');
 const { body,validationResult } = require('express-validator/check');
 const { sanitizeBody } = require('express-validator/filter');
 const cryptoPassword = require('../crypto/password');
+const cryptoSecret = require('../crypto/secret');
+const cryptoToken = require('../crypto/token');
 const speakeasy = require('speakeasy');
 
 exports.index = (req, res, next) => {
@@ -22,11 +24,7 @@ exports.get_config_second = (req, res, next) => {
         .then(user => {
 
             // genero il segreto temporaneo per l'utente
-            const twoFactorSecret = speakeasy.generateSecret({
-                length: 64,
-                name: 'Progetto Sicurezza',
-                issuer: 'Unibo'
-            });
+            const twoFactorSecret = cryptoSecret.generate_secret();
             user.two_factor_temp_secret = twoFactorSecret.hex;
 
             // salvo il segreto
@@ -159,7 +157,7 @@ exports.verify_second = [
             .then(user => {
                 let storedSecret = isConfig ? user.two_factor_temp_secret : user.two_factor_secret;
 
-                let verified = speakeasy.totp.verify({
+                let verified = cryptoToken.verify_totp({
                     secret: storedSecret,
                     encoding: 'hex',
                     token: userToken
