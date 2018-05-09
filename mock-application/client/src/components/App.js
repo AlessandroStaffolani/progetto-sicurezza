@@ -10,6 +10,7 @@ import Home from '../pages/Home';
 import Protected from "../pages/Protected";
 import NotFound from "../pages/NotFound";
 import Register from "../pages/Register";
+import Dashboard from "../pages/Dashboard";
 
 const styles = theme => ({
     body: {
@@ -235,7 +236,6 @@ class App extends Component {
                     } else {
                         // success
                         const verified = response.data;
-                        console.log(verified);
                         this.setState({
                             isAuthenticated: true,
                             redirectToProtected: true
@@ -266,25 +266,32 @@ class App extends Component {
                     <AppBar pages={pages} title={'Two Factor Authentication'}/>
                     <Switch>
                         <Route exact path="/" render={
-                            (props) =>
-                                <Home {...props}
-                                      showForbidden={this.state.showForbidden}
-                                      handleClose={this.handleCloseAlert}
-                                      username={this.state.username}
-                                      password={this.state.password}
-                                      token={this.state.token}
-                                      showPassword={this.state.showPassword}
-                                      firstFactor={this.state.firstFactor}
-                                      handleClickShowPassword={this.handleClickShowPassword}
-                                      handleMouseDownPassword={this.handleMouseDownPassword}
-                                      handleChange={this.handleChange}
-                                      handleSubmit={this.handleSubmit}
-                                      redirectToProtected={this.state.redirectToProtected}
-                                      handleRedirectToProtected={this.handleRedirectToProtected}
-                                />}
-                        />
+                            (props) => (this.state.isAuthenticated ? (
+                                <Redirect to={{
+                                    pathname: '/dashboard',
+                                    state: { username: this.state.username.value }
+                                }}/>
+                            ) : (
+                                    <Home {...props}
+                                          showForbidden={this.state.showForbidden}
+                                          handleClose={this.handleCloseAlert}
+                                          username={this.state.username}
+                                          password={this.state.password}
+                                          token={this.state.token}
+                                          showPassword={this.state.showPassword}
+                                          firstFactor={this.state.firstFactor}
+                                          handleClickShowPassword={this.handleClickShowPassword}
+                                          handleMouseDownPassword={this.handleMouseDownPassword}
+                                          handleChange={this.handleChange}
+                                          handleSubmit={this.handleSubmit}
+                                          redirectToProtected={this.state.redirectToProtected}
+                                          handleRedirectToProtected={this.handleRedirectToProtected}
+                                    />
+                                ) )}
+                            />
                         <Route path="/register" component={Register} />
                         <PrivateRoute path="/protected" component={Protected} isAuthenticated={this.state.isAuthenticated} />
+                        <PrivateRoute path="/dashboard" component={Dashboard} isAuthenticated={this.state.isAuthenticated} />
                         <Route component={NotFound} />
                     </Switch>
                 </div>

@@ -5,7 +5,7 @@ const { sanitizeBody } = require('express-validator/filter');
 const cryptoPassword = require('../crypto/password');
 const cryptoSecret = require('../crypto/secret');
 const cryptoToken = require('../crypto/token');
-const speakeasy = require('speakeasy');
+const config = require('../config/config');
 
 exports.index = (req, res, next) => {
     res.header('Content-Type', 'application/json');
@@ -24,7 +24,9 @@ exports.get_config_second = (req, res, next) => {
         .then(user => {
 
             // genero il segreto temporaneo per l'utente
-            const twoFactorSecret = cryptoSecret.generate_secret();
+            const twoFactorSecret = cryptoSecret.generate_secret({
+                name: config.secondFactorSecret.name + ' - ' + username
+            });
             user.two_factor_temp_secret = twoFactorSecret.hex;
 
             // salvo il segreto

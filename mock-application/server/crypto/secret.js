@@ -11,6 +11,16 @@ exports.generate_secret = (opt) => {
         options.issuer = secretConfig.issuer;
     }
 
+    if (options.length === undefined) {
+        options.length = secretConfig.length
+    }
+    if (options.name === undefined) {
+        options.name = secretConfig.name
+    }
+    if (options.issuer === undefined) {
+        options.issuer = secretConfig.issuer
+    }
+
     return speakeasy.generateSecret(options);
 
 };
