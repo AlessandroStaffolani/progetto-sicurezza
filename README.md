@@ -1,3 +1,3 @@
 # Progetto Sicurezza
 
-Attività progettuale per l'esame di sicurezza informatica sull'autenticazione a due fattori
+Project work for the exam of IT Security on the two factors authentication
